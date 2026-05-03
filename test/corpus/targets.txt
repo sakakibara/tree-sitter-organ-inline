@@ -1,0 +1,19 @@
+==================
+Simple target
+==================
+<<my target>>
+---
+
+(inline_content
+  (target))
+
+==================
+Target mixed with text
+==================
+before <<here>> after
+---
+
+(inline_content
+  (plain_text)
+  (target)
+  (plain_text))

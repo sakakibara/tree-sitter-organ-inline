@@ -1,0 +1,913 @@
+{
+  "$schema": "https://tree-sitter.github.io/tree-sitter/assets/schemas/grammar.schema.json",
+  "name": "org_inline",
+  "rules": {
+    "inline_content": {
+      "type": "REPEAT",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_inline_object"
+      }
+    },
+    "_inline_object": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "bold"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "italic"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "underline"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "strike"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "verbatim"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "code"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "link_regular"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "link_plain"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "link_angle"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "link_radio"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_range_active"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_range_inactive"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_active"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_inactive"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_diary"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "citation"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "macro"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "inline_src_block"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "export_snippet"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "footnote_ref"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "target"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "statistics_cookie"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "line_break"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "subscript"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "superscript"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "entity"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "latex_fragment"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "inline_babel_call"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "plain_text"
+        }
+      ]
+    },
+    "bold": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_bold_open"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_inline_object"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_bold_close"
+        }
+      ]
+    },
+    "italic": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_italic_open"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_inline_object"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_italic_close"
+        }
+      ]
+    },
+    "underline": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_underline_open"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_inline_object"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_underline_close"
+        }
+      ]
+    },
+    "strike": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_strike_open"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_inline_object"
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_strike_close"
+        }
+      ]
+    },
+    "verbatim": {
+      "type": "SYMBOL",
+      "name": "_verbatim_token"
+    },
+    "code": {
+      "type": "SYMBOL",
+      "name": "_code_token"
+    },
+    "link_regular": {
+      "type": "SYMBOL",
+      "name": "_link_regular_token"
+    },
+    "link_plain": {
+      "type": "SYMBOL",
+      "name": "_link_plain_token"
+    },
+    "link_angle": {
+      "type": "SYMBOL",
+      "name": "_link_angle_token"
+    },
+    "link_radio": {
+      "type": "SYMBOL",
+      "name": "_link_radio_token"
+    },
+    "timestamp_active": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_ts_open_active"
+        },
+        {
+          "type": "FIELD",
+          "name": "date",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ts_date"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "dayname",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_dayname"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "time",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "ts_time"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "ts_time_range"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "repeater",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alarm",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater_alarm"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "filter",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater_filter"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "warning",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_warning"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_ts_close_active"
+        }
+      ]
+    },
+    "timestamp_inactive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_ts_open_inactive"
+        },
+        {
+          "type": "FIELD",
+          "name": "date",
+          "content": {
+            "type": "SYMBOL",
+            "name": "ts_date"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "dayname",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_dayname"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "time",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "ts_time"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "ts_time_range"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "repeater",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "alarm",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater_alarm"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "filter",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_repeater_filter"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "FIELD",
+              "name": "warning",
+              "content": {
+                "type": "SYMBOL",
+                "name": "ts_warning"
+              }
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_ts_close_inactive"
+        }
+      ]
+    },
+    "ts_date": {
+      "type": "SYMBOL",
+      "name": "_ts_date_token"
+    },
+    "ts_dayname": {
+      "type": "SYMBOL",
+      "name": "_ts_dayname_token"
+    },
+    "ts_time": {
+      "type": "SYMBOL",
+      "name": "_ts_time_token"
+    },
+    "ts_time_range": {
+      "type": "SYMBOL",
+      "name": "_ts_time_range_token"
+    },
+    "ts_repeater": {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_token"
+    },
+    "ts_repeater_alarm": {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_alarm_token"
+    },
+    "ts_repeater_filter": {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_filter_token"
+    },
+    "ts_warning": {
+      "type": "SYMBOL",
+      "name": "_ts_warning_token"
+    },
+    "timestamp_diary": {
+      "type": "SYMBOL",
+      "name": "_ts_diary_token"
+    },
+    "timestamp_range_active": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_active"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_ts_range_separator"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_active"
+        }
+      ]
+    },
+    "timestamp_range_inactive": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_inactive"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_ts_range_separator"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "timestamp_inactive"
+        }
+      ]
+    },
+    "citation": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_citation_open"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "citation_style"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_citation_colon"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "citation_reference"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_citation_separator"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "citation_reference"
+              }
+            ]
+          }
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_citation_close"
+        }
+      ]
+    },
+    "citation_reference": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "citation_prefix"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "citation_key"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "citation_suffix"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
+    },
+    "citation_style": {
+      "type": "SYMBOL",
+      "name": "_citation_style_token"
+    },
+    "citation_prefix": {
+      "type": "SYMBOL",
+      "name": "_citation_text_token"
+    },
+    "citation_suffix": {
+      "type": "SYMBOL",
+      "name": "_citation_text_token"
+    },
+    "citation_key": {
+      "type": "SYMBOL",
+      "name": "_citation_key_token"
+    },
+    "macro": {
+      "type": "SYMBOL",
+      "name": "_macro_token"
+    },
+    "inline_src_block": {
+      "type": "SYMBOL",
+      "name": "_inline_src_block_token"
+    },
+    "export_snippet": {
+      "type": "SYMBOL",
+      "name": "_export_snippet_token"
+    },
+    "footnote_ref": {
+      "type": "SYMBOL",
+      "name": "_footnote_ref_token"
+    },
+    "target": {
+      "type": "SYMBOL",
+      "name": "_target_token"
+    },
+    "statistics_cookie": {
+      "type": "SYMBOL",
+      "name": "_statistics_cookie_token"
+    },
+    "line_break": {
+      "type": "SYMBOL",
+      "name": "_line_break_token"
+    },
+    "subscript": {
+      "type": "SYMBOL",
+      "name": "_subscript_token"
+    },
+    "superscript": {
+      "type": "SYMBOL",
+      "name": "_superscript_token"
+    },
+    "entity": {
+      "type": "SYMBOL",
+      "name": "_entity_token"
+    },
+    "latex_fragment": {
+      "type": "SYMBOL",
+      "name": "_latex_fragment_token"
+    },
+    "inline_babel_call": {
+      "type": "SYMBOL",
+      "name": "_inline_babel_call_token"
+    },
+    "plain_text": {
+      "type": "SYMBOL",
+      "name": "_plain_text_token"
+    }
+  },
+  "extras": [],
+  "conflicts": [],
+  "precedences": [],
+  "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "_bold_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_bold_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_italic_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_italic_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_underline_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_underline_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_strike_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_strike_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_verbatim_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_code_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_plain_text_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_link_regular_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_link_plain_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_link_angle_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_link_radio_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_open_active"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_close_active"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_open_inactive"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_close_inactive"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_date_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_dayname_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_time_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_time_range_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_alarm_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_repeater_filter_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_warning_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_diary_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_ts_range_separator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_open"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_style_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_colon"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_text_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_key_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_separator"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_citation_close"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_macro_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_inline_src_block_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_export_snippet_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_footnote_ref_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_target_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_statistics_cookie_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_line_break_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_subscript_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_superscript_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_entity_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_latex_fragment_token"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "_inline_babel_call_token"
+    }
+  ],
+  "inline": [],
+  "supertypes": []
+}

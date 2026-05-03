@@ -1,0 +1,37 @@
+==================
+Named footnote ref
+==================
+[fn:label]
+---
+
+(inline_content
+  (footnote_ref))
+
+==================
+Named footnote ref with definition
+==================
+[fn:label:definition text]
+---
+
+(inline_content
+  (footnote_ref))
+
+==================
+Anonymous footnote ref
+==================
+[fn::inline definition]
+---
+
+(inline_content
+  (footnote_ref))
+
+==================
+Footnote ref mixed with text
+==================
+See here[fn:1] for more.
+---
+
+(inline_content
+  (plain_text)
+  (footnote_ref)
+  (plain_text))

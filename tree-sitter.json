@@ -1,0 +1,28 @@
+{
+  "grammars": [
+    {
+      "name": "org-inline",
+      "camelcase": "OrgInline",
+      "scope": "source.org_inline",
+      "path": ".",
+      "file-types": [],
+      "injection-regex": "^org_inline$"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Inline-content grammar for Org mode",
+    "links": {
+      "repository": "https://github.com/sakakibara/tree-sitter-organ-inline"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true
+  }
+}

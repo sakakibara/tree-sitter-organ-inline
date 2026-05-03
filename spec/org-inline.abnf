@@ -1,0 +1,268 @@
+; ============================================================================
+; org-inline.abnf — Formal specification of the inline-content dialect this
+;                   tree-sitter grammar accepts. A superset of Emacs Org's
+;                   inline-object syntax: see "Superset over vanilla Org" at
+;                   the end of this file for the deltas.
+;
+; The companion block-level spec is `org.abnf` in `tree-sitter-organ`.
+;
+; License: MIT (see /LICENSE in this repository)
+; Source of truth (vanilla): https://orgmode.org/worg/dev/org-syntax.html  §17
+; Cross-reference (verification only): Emacs `org-element.el` (GPL v3+).
+;   No code, prose, or fixtures are copied from GPL-licensed sources.
+; Format: RFC 5234 ABNF (https://datatracker.ietf.org/doc/html/rfc5234)
+; ============================================================================
+;
+; Conventions:
+;   - Rule names: lower-case-with-hyphens
+;   - Each rule annotated with the Worg sub-section it derives from
+;   - Order: primitives → markup → links / targets → timestamps → citations
+;     → macros / babel → footnote refs → cookies → entities / latex
+;     → sub-/superscript → line breaks → plain text → superset
+;   - Comments start with `;`
+;
+; ============================================================================
+; Primitives
+; ============================================================================
+
+; ABNF core rules (ALPHA, DIGIT, SP, HTAB, CR, LF) are imported from
+; RFC 5234 §B.1.
+
+line-end        =  LF / CRLF
+indent          =  *(SP / HTAB)
+non-line        =  %x00-09 / %x0B-FF                  ; any byte except LF
+non-bracket     =  %x20-3B / %x3D / %x3F-5B / %x5D-7E / %x80-FF
+                   ; any byte except `<` `>` `[` `]`
+non-paren       =  %x20-27 / %x2A-7E / %x80-FF        ; any byte except `(` `)`
+non-brace       =  %x20-7C / %x7E-FF                  ; any byte except `}`
+
+; ============================================================================
+; Inline content
+; ============================================================================
+
+inline-content  =  *inline-object
+
+inline-object   =  bold / italic / underline / strike / verbatim / code /
+                   link-regular / link-plain / link-angle / link-radio /
+                   timestamp-active / timestamp-inactive / timestamp-diary /
+                   timestamp-range-active / timestamp-range-inactive /
+                   citation / footnote-ref / target /
+                   macro / statistics-cookie / latex-fragment / entity /
+                   export-snippet / inline-babel-call / inline-src-block /
+                   line-break / subscript / superscript / plain-text
+
+; ============================================================================
+; Markup spans  (Worg §17 Emphasis and Monospace)
+; ============================================================================
+;
+; Markup characters: * (bold), / (italic), _ (underline), + (strike),
+; ~ (code), = (verbatim). Bold / italic / underline / strike are
+; nestable; code + verbatim are not (their content is taken verbatim).
+
+bold            =  "*"  inline-content "*"
+italic          =  "/"  inline-content "/"
+underline       =  "_"  inline-content "_"
+strike          =  "+"  inline-content "+"
+verbatim        =  "="  1*verbatim-char "="
+verbatim-char   =  %x20-3C / %x3E-7E / %x80-FF        ; any byte except `=`
+code            =  "~"  1*code-char "~"
+code-char       =  %x20-7D / %x80-FF                  ; any byte except `~`
+
+; ============================================================================
+; Plain text
+; ============================================================================
+
+plain-text      =  1*plain-char
+plain-char      =  %x20 / %x21-29 / %x2C-2E / %x30-3A / %x3F-7B / %x7C-7E / %x80-FF
+                   ; any byte that doesn't open another inline construct
+
+; ============================================================================
+; Links  (Worg §17 Links)
+; ============================================================================
+
+link-regular     =  "[[" link-target [ "][" link-description ] "]]"
+link-target      =  1*(target-char / target-escape)
+target-char      =  %x20-5C / %x5E-7E / %x80-FF       ; any byte except `]`
+target-escape    =  "\\" %x5D                          ; \] inside target
+link-description =  1*(desc-char / target-escape)
+desc-char        =  %x20-5C / %x5E-7E / %x80-FF
+
+link-plain       =  link-protocol "://" 1*plain-url-char
+link-protocol    =  "http" / "https" / "ftp" / "mailto" / "doi" / "id"
+                    / 1*ALPHA                          ; user-defined link types
+plain-url-char   =  %x21-3B / %x3D / %x3F-7E / %x80-FF
+link-angle       =  "<" link-protocol "://" 1*angle-char ">"
+angle-char       =  %x20-3D / %x3F-7E / %x80-FF        ; any byte except `>`
+link-radio       =  "<<<" 1*non-bracket ">>>"
+
+; ============================================================================
+; Targets  (Worg §17 Radio / Targets)
+; ============================================================================
+
+target           =  "<<" 1*non-bracket ">>"
+
+; ============================================================================
+; Timestamps  (Worg §17 Timestamps)
+; ============================================================================
+
+timestamp-active   =  "<" ts-payload ">"
+timestamp-inactive =  "[" ts-payload "]"
+
+ts-payload         =  ts-date [SP ts-dayname]
+                       [SP (ts-time / ts-time-range)]
+                       [SP ts-repeater]
+                       [SP ts-repeater-alarm]            ; superset, see end
+                       [SP ts-repeater-filter]           ; superset, see end
+                       [SP ts-warning]
+
+ts-date            =  4DIGIT "-" 2DIGIT "-" 2DIGIT
+ts-dayname         =  3*5(ALPHA)                         ; e.g. Mon, Tue, Sun
+ts-time            =  2DIGIT ":" 2DIGIT
+ts-time-range      =  ts-time "-" ts-time
+
+ts-repeater        =  ts-repeater-mark 1*DIGIT ts-unit
+ts-repeater-mark   =  ".+" / "++" / "+"                  ; restart-, cumulate-, plain
+ts-repeater-alarm  =  "/"  1*DIGIT ts-unit               ; org-habit `/Nu`
+ts-repeater-filter =  "[" 1*(ALPHA / DIGIT / ":") "]"   ; superset (see end)
+
+ts-warning         =  ts-warning-mark 1*DIGIT ts-unit
+ts-warning-mark    =  "--" / "-"
+ts-unit            =  "h" / "d" / "w" / "m" / "y"
+
+; Range form
+timestamp-range-active   =  timestamp-active   "--" timestamp-active
+timestamp-range-inactive =  timestamp-inactive "--" timestamp-inactive
+
+; Diary form
+timestamp-diary    =  "<%%(" 1*non-bracket ")>"
+
+; ============================================================================
+; Citations  (Worg §17 Citations)
+; ============================================================================
+
+citation              =  "[cite" [citation-style] ":" SP
+                          [citation-prefix] citation-reference
+                          *(";" SP [citation-prefix] citation-reference [citation-suffix])
+                          [citation-suffix] "]"
+citation-style        =  "/" 1*(ALPHA / "/")
+citation-reference    =  "@" citation-key
+citation-key          =  1*(ALPHA / DIGIT / "_" / "-" / ":")
+citation-prefix       =  1*non-bracket-or-semi
+citation-suffix       =  1*non-bracket-or-semi
+non-bracket-or-semi   =  %x20-3A / %x3C-5C / %x5E-7E / %x80-FF
+                         ; any byte except `;` `]` `[`
+
+; ============================================================================
+; Macros  (Worg §17 Macros)
+; ============================================================================
+
+macro            =  "{{{" macro-name [ "(" macro-args ")" ] "}}}"
+macro-name       =  1*(ALPHA / DIGIT / "_" / "-")
+macro-args       =  macro-arg *("," macro-arg)
+macro-arg        =  *(macro-arg-char / macro-arg-escape)
+macro-arg-char   =  %x20-27 / %x2A-7C / %x7E-FF        ; any byte except `(` `)` `,` `}`
+macro-arg-escape =  "\\" ("," / ")")
+
+; ============================================================================
+; Inline source blocks  (Worg §17 Inline Source Block)
+; ============================================================================
+
+inline-src-block =  "src_" inline-src-lang [ "[" inline-src-args "]" ]
+                    "{" inline-src-body "}"
+inline-src-lang  =  1*(ALPHA / DIGIT / "_" / "-")
+inline-src-args  =  *non-bracket
+inline-src-body  =  *(inline-src-char / inline-src-escape)
+inline-src-char  =  %x20-7C / %x7E-FF                  ; any byte except `}`
+inline-src-escape=  "\\" "}"
+
+; ============================================================================
+; Inline babel calls  (Worg §17 Inline Babel Calls)
+; ============================================================================
+
+inline-babel-call =  "call_" babel-name [ "[" babel-args "]" ]
+                     "(" babel-args ")" [ "[" babel-args "]" ]
+babel-name        =  1*(ALPHA / DIGIT / "_" / "-")
+babel-args        =  *non-paren
+
+; ============================================================================
+; Export snippets  (Worg §17 Export Snippets)
+; ============================================================================
+
+export-snippet   =  "@@" export-backend ":" export-value "@@"
+export-backend   =  1*(ALPHA / "-")
+export-value     =  *(snippet-char / snippet-escape)
+snippet-char     =  %x20-3F / %x41-7E / %x80-FF        ; any byte except `@`
+snippet-escape   =  "\\@"
+
+; ============================================================================
+; Footnote references  (Worg §17 Footnote References)
+; ============================================================================
+
+footnote-ref           =  footnote-ref-named / footnote-ref-anonymous /
+                          footnote-ref-inline
+footnote-ref-named     =  "[fn:" footnote-label "]"
+footnote-ref-anonymous =  "[fn:" footnote-label ":" 1*non-bracket "]"
+footnote-ref-inline    =  "[fn::" 1*non-bracket "]"
+footnote-label         =  1*(ALPHA / DIGIT / "_" / "-")
+
+; ============================================================================
+; Statistics cookies  (Worg §17 Statistics Cookies)
+; ============================================================================
+
+statistics-cookie   =  "[" cookie-body "]"
+cookie-body         =  cookie-pct / cookie-frac
+cookie-pct          =  *DIGIT "%"
+cookie-frac         =  *DIGIT "/" *DIGIT
+
+; ============================================================================
+; Entities and LaTeX fragments  (Worg §17)
+; ============================================================================
+
+entity              =  "\\" entity-name [ "{}" ]
+entity-name         =  1*ALPHA                         ; e.g. \alpha, \omega
+
+latex-fragment      =  latex-paren / latex-bracket / latex-dollar1 / latex-dollar2
+latex-paren         =  "\\(" 1*latex-char "\\)"
+latex-bracket       =  "\\[" 1*latex-char "\\]"
+latex-dollar1       =  "$"  latex-char "$"             ; single-char body
+latex-dollar2       =  "$$" 1*latex-char "$$"
+latex-char          =  %x20-23 / %x25-7E / %x80-FF     ; any byte except `$`
+
+; ============================================================================
+; Sub-/superscript  (Worg §17 Subscript/Superscript)
+; ============================================================================
+
+subscript           =  "_" subscript-body
+superscript         =  "^" superscript-body
+subscript-body      =  "{" 1*non-brace "}" / 1*ALPHA / 1*DIGIT
+superscript-body    =  "{" 1*non-brace "}" / 1*ALPHA / 1*DIGIT
+
+; ============================================================================
+; Line breaks  (Worg §17 Line Breaks)
+; ============================================================================
+
+line-break          =  "\\\\" indent line-end           ; `\\` then optional WS then EOL
+
+; ============================================================================
+; Superset over vanilla Org
+; ============================================================================
+;
+; This grammar extends the standard timestamp repeater with two
+; optional decorations that follow the base period inside `<…>` or
+; `[…]`:
+;
+;     <DATE +1w        /1d   [wd]    -1d>
+;            ^repeater  ^alarm ^filter ^warning
+;
+;   - alarm   (`ts-repeater-alarm`)  — `/Nu`. Standard `org-habit`
+;             syntax in Emacs; this grammar exposes it as a distinct
+;             AST node rather than folding it into the repeater token.
+;             So while the surface form is vanilla, the AST shape is
+;             a slight superset.
+;   - filter  (`ts-repeater-filter`) — `[…]` immediately after the
+;             repeater (or alarm). NOT in vanilla Org; semantics are
+;             consumer-defined (`[wd]` = weekdays only,
+;             `[cal:hk]` = a named holiday calendar, etc.).
+;
+; Inputs that parse cleanly under vanilla Org parse identically here;
+; the filter only kicks in when `[…]` appears inside a timestamp.

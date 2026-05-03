@@ -1,0 +1,28 @@
+==================
+Simple macro
+==================
+{{{name}}}
+---
+
+(inline_content
+  (macro))
+
+==================
+Macro with arguments
+==================
+{{{name(arg1, arg2)}}}
+---
+
+(inline_content
+  (macro))
+
+==================
+Macro mixed with text
+==================
+before {{{macro}}} after
+---
+
+(inline_content
+  (plain_text)
+  (macro)
+  (plain_text))

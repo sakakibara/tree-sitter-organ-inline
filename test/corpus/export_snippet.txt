@@ -1,0 +1,28 @@
+==================
+Export snippet
+==================
+@@html:<b>bold</b>@@
+---
+
+(inline_content
+  (export_snippet))
+
+==================
+Export snippet latex
+==================
+@@latex:\textbf{hello}@@
+---
+
+(inline_content
+  (export_snippet))
+
+==================
+Export snippet mixed with text
+==================
+before @@html:x@@ after
+---
+
+(inline_content
+  (plain_text)
+  (export_snippet)
+  (plain_text))

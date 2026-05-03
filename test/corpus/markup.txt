@@ -1,0 +1,90 @@
+==================
+Bold span
+==================
+*hello*
+---
+
+(inline_content
+  (bold
+    (plain_text)))
+
+==================
+Italic span
+==================
+/hello/
+---
+
+(inline_content
+  (italic
+    (plain_text)))
+
+==================
+Bold containing italic
+==================
+*outer /inner/ end*
+---
+
+(inline_content
+  (bold
+    (plain_text)
+    (italic
+      (plain_text))
+    (plain_text)))
+
+==================
+Underline and strike
+==================
+_a_ +b+
+---
+
+(inline_content
+  (underline
+    (plain_text))
+  (plain_text)
+  (strike
+    (plain_text)))
+
+==================
+Plain text only
+==================
+just text
+---
+
+(inline_content
+  (plain_text))
+
+==================
+Verbatim span
+==================
+=hello=
+---
+
+(inline_content
+  (verbatim))
+
+==================
+Code span
+==================
+~hello~
+---
+
+(inline_content
+  (code))
+
+==================
+Verbatim with internal asterisk (not nestable)
+==================
+=foo*bar=
+---
+
+(inline_content
+  (verbatim))
+
+==================
+Verbatim after plain text
+==================
+text ~code~
+---
+(inline_content
+  (plain_text)
+  (code))

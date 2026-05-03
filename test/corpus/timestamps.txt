@@ -1,0 +1,67 @@
+==================
+Active timestamp date only
+==================
+<2026-04-28>
+---
+
+(inline_content
+  (timestamp_active
+    (ts_date)))
+
+==================
+Active timestamp with dayname
+==================
+<2026-04-28 Tue>
+---
+
+(inline_content
+  (timestamp_active
+    (ts_date)
+    (ts_dayname)))
+
+==================
+Active timestamp with time
+==================
+<2026-04-28 Tue 09:00>
+---
+
+(inline_content
+  (timestamp_active
+    (ts_date)
+    (ts_dayname)
+    (ts_time)))
+
+==================
+Active timestamp with time range
+==================
+<2026-04-28 Tue 09:00-10:00>
+---
+
+(inline_content
+  (timestamp_active
+    (ts_date)
+    (ts_dayname)
+    (ts_time_range)))
+
+==================
+Active timestamp with repeater
+==================
+<2026-04-28 Tue +1w>
+---
+
+(inline_content
+  (timestamp_active
+    (ts_date)
+    (ts_dayname)
+    (ts_repeater)))
+
+==================
+Inactive timestamp
+==================
+[2026-04-28 Mon]
+---
+
+(inline_content
+  (timestamp_inactive
+    (ts_date)
+    (ts_dayname)))

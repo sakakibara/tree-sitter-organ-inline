@@ -1,0 +1,62 @@
+==================
+Entity
+==================
+\alpha
+---
+
+(inline_content
+  (entity))
+
+==================
+Entity with empty braces
+==================
+\omega{}
+---
+
+(inline_content
+  (entity))
+
+==================
+LaTeX paren fragment
+==================
+\(x + y\)
+---
+
+(inline_content
+  (latex_fragment))
+
+==================
+LaTeX dollar inline
+==================
+$x$
+---
+
+(inline_content
+  (latex_fragment))
+
+==================
+LaTeX dollar display
+==================
+$$x + y$$
+---
+
+(inline_content
+  (latex_fragment))
+
+==================
+Inline babel call
+==================
+call_name(args)
+---
+
+(inline_content
+  (inline_babel_call))
+
+==================
+Inline babel call with header and results
+==================
+call_name[header](args)[results]
+---
+
+(inline_content
+  (inline_babel_call))

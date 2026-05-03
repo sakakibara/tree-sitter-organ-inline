@@ -1,0 +1,46 @@
+==================
+Regular link with target only
+==================
+[[https://example.com]]
+---
+
+(inline_content
+  (link_regular))
+
+==================
+Regular link with description
+==================
+[[https://example.com][example]]
+---
+
+(inline_content
+  (link_regular))
+
+==================
+Angle link
+==================
+<https://example.com>
+---
+
+(inline_content
+  (link_angle))
+
+==================
+Radio link
+==================
+<<<radio>>>
+---
+
+(inline_content
+  (link_radio))
+
+==================
+Mixed: text and link
+==================
+hello [[a]] world
+---
+
+(inline_content
+  (plain_text)
+  (link_regular)
+  (plain_text))
