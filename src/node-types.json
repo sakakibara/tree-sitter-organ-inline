@@ -224,7 +224,7 @@
       },
       "label": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "footnote_label",

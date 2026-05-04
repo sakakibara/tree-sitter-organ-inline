@@ -5,7 +5,8 @@ Simple macro
 ---
 
 (inline_content
-  (macro))
+  (macro
+    (macro_name)))
 
 ==================
 Macro with arguments
@@ -14,7 +15,10 @@ Macro with arguments
 ---
 
 (inline_content
-  (macro))
+  (macro
+    (macro_name)
+    (macro_argument)
+    (macro_argument)))
 
 ==================
 Macro mixed with text
@@ -24,5 +28,6 @@ before {{{macro}}} after
 
 (inline_content
   (plain_text)
-  (macro)
+  (macro
+    (macro_name))
   (plain_text))

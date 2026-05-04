@@ -5,7 +5,9 @@ src_python{print("hi")}
 ---
 
 (inline_content
-  (inline_src_block))
+  (inline_src_block
+    (inline_src_language)
+    (inline_src_body)))
 
 ==================
 Inline source block with args
@@ -14,7 +16,10 @@ src_python[:exports code]{x = 1}
 ---
 
 (inline_content
-  (inline_src_block))
+  (inline_src_block
+    (inline_src_language)
+    (inline_src_args)
+    (inline_src_body)))
 
 ==================
 Inline source mixed with text
@@ -24,5 +29,7 @@ call src_emacs-lisp{(+ 1 2)} done
 
 (inline_content
   (plain_text)
-  (inline_src_block)
+  (inline_src_block
+    (inline_src_language)
+    (inline_src_body))
   (plain_text))

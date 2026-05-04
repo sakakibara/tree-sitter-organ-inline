@@ -4,10 +4,10 @@ Simple citation
 [cite:@key]
 ---
 
-inline_content
-  citation
-    citation_reference
-      citation_key
+(inline_content
+  (citation
+    (citation_reference
+      (citation_key))))
 
 ==================
 Citation with style
@@ -15,11 +15,11 @@ Citation with style
 [cite/style:@key]
 ---
 
-inline_content
-  citation
-    citation_style
-    citation_reference
-      citation_key
+(inline_content
+  (citation
+    (citation_style)
+    (citation_reference
+      (citation_key))))
 
 ==================
 Citation with prefix and suffix
@@ -27,12 +27,12 @@ Citation with prefix and suffix
 [cite:prefix @key suffix]
 ---
 
-inline_content
-  citation
-    citation_reference
-      citation_prefix
-      citation_key
-      citation_suffix
+(inline_content
+  (citation
+    (citation_reference
+      (citation_prefix)
+      (citation_key)
+      (citation_suffix))))
 
 ==================
 Citation with multiple references
@@ -40,9 +40,9 @@ Citation with multiple references
 [cite:@key1; @key2]
 ---
 
-inline_content
-  citation
-    citation_reference
-      citation_key
-    citation_reference
-      citation_key
+(inline_content
+  (citation
+    (citation_reference
+      (citation_key))
+    (citation_reference
+      (citation_key))))

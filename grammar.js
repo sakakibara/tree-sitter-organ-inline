@@ -218,12 +218,14 @@ module.exports = grammar({
 
     export_snippet: $ => $._export_snippet_token,
 
-    /* Footnote reference: `[fn:label]` or `[fn:label:body]` (inline
-     * definition). Scanner emits `_footnote_ref_token` covering only
-     * `[fn:`; JS consumes label + optional `:body` + `]`. */
+    /* Footnote reference. Three surface forms:
+     *   `[fn:label]`        — labelled
+     *   `[fn:label:body]`   — labelled with inline definition
+     *   `[fn::body]`        — anonymous (empty label) inline definition
+     * Scanner emits `_footnote_ref_token` covering only `[fn:`. */
     footnote_ref: $ => seq(
       $._footnote_ref_token,
-      field('label', $.footnote_label),
+      optional(field('label', $.footnote_label)),
       optional(seq(':', field('body', $.footnote_body))),
       ']',
     ),

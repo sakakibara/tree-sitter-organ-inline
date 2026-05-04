@@ -5,7 +5,8 @@ Regular link with target only
 ---
 
 (inline_content
-  (link_regular))
+  (link_regular
+    (link_target)))
 
 ==================
 Regular link with description
@@ -14,7 +15,9 @@ Regular link with description
 ---
 
 (inline_content
-  (link_regular))
+  (link_regular
+    (link_target)
+    (link_description)))
 
 ==================
 Angle link
@@ -23,7 +26,8 @@ Angle link
 ---
 
 (inline_content
-  (link_angle))
+  (link_angle
+    (link_target)))
 
 ==================
 Radio link
@@ -32,7 +36,8 @@ Radio link
 ---
 
 (inline_content
-  (link_radio))
+  (link_radio
+    (link_target)))
 
 ==================
 Mixed: text and link
@@ -42,5 +47,6 @@ hello [[a]] world
 
 (inline_content
   (plain_text)
-  (link_regular)
+  (link_regular
+    (link_target))
   (plain_text))

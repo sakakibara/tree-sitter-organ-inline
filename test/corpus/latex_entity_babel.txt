@@ -50,7 +50,9 @@ call_name(args)
 ---
 
 (inline_content
-  (inline_babel_call))
+  (inline_babel_call
+    (inline_call_name)
+    (inline_call_args)))
 
 ==================
 Inline babel call with header and results
@@ -59,4 +61,8 @@ call_name[header](args)[results]
 ---
 
 (inline_content
-  (inline_babel_call))
+  (inline_babel_call
+    (inline_call_name)
+    (inline_call_args)
+    (inline_call_args))
+  (plain_text))

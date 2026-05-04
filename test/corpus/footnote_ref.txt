@@ -5,7 +5,8 @@ Named footnote ref
 ---
 
 (inline_content
-  (footnote_ref))
+  (footnote_ref
+    (footnote_label)))
 
 ==================
 Named footnote ref with definition
@@ -14,7 +15,9 @@ Named footnote ref with definition
 ---
 
 (inline_content
-  (footnote_ref))
+  (footnote_ref
+    (footnote_label)
+    (footnote_body)))
 
 ==================
 Anonymous footnote ref
@@ -23,7 +26,8 @@ Anonymous footnote ref
 ---
 
 (inline_content
-  (footnote_ref))
+  (footnote_ref
+    (footnote_body)))
 
 ==================
 Footnote ref mixed with text
@@ -33,5 +37,6 @@ See here[fn:1] for more.
 
 (inline_content
   (plain_text)
-  (footnote_ref)
+  (footnote_ref
+    (footnote_label))
   (plain_text))

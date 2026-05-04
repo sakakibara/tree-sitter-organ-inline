@@ -1,0 +1,160 @@
+==================
+link_regular: target only
+==================
+See [[id:abc-uuid]] here.
+
+---
+
+(inline_content
+  (plain_text)
+  (link_regular
+    (link_target))
+  (plain_text))
+
+==================
+link_regular: target + description
+==================
+See [[id:abc][see this]] here.
+
+---
+
+(inline_content
+  (plain_text)
+  (link_regular
+    (link_target)
+    (link_description))
+  (plain_text))
+
+==================
+link_plain
+==================
+visit https://example.com today
+
+---
+
+(inline_content
+  (plain_text)
+  (italic)
+  (plain_text))
+
+==================
+link_angle
+==================
+see <https://example.com> please
+
+---
+
+(inline_content
+  (plain_text)
+  (link_angle
+    (link_target))
+  (plain_text))
+
+==================
+macro: bare name
+==================
+hello {{{author}}} world
+
+---
+
+(inline_content
+  (plain_text)
+  (macro
+    (macro_name))
+  (plain_text))
+
+==================
+macro: name with single argument
+==================
+{{{greet(world)}}}
+
+---
+
+(inline_content
+  (macro
+    (macro_name)
+    (macro_argument))
+  (plain_text))
+
+==================
+macro: name with multiple arguments
+==================
+{{{title(arg1, arg two, arg three)}}}
+
+---
+
+(inline_content
+  (macro
+    (macro_name)
+    (macro_argument)
+    (macro_argument)
+    (macro_argument))
+  (plain_text))
+
+==================
+footnote_ref: numeric label
+==================
+text [fn:1] more
+
+---
+
+(inline_content
+  (plain_text)
+  (footnote_ref
+    (footnote_label))
+  (plain_text))
+
+==================
+footnote_ref: named label with inline body
+==================
+text [fn:my-note:inline definition] after
+
+---
+
+(inline_content
+  (plain_text)
+  (footnote_ref
+    (footnote_label)
+    (footnote_body))
+  (plain_text))
+
+==================
+inline_src_block: language + body only
+==================
+result is src_lua{print("hi")} done
+
+---
+
+(inline_content
+  (plain_text)
+  (inline_src_block
+    (inline_src_language)
+    (inline_src_body))
+  (plain_text))
+
+==================
+inline_src_block: language + header_args + body
+==================
+src_python[:results output]{x = 1}
+
+---
+
+(inline_content
+  (inline_src_block
+    (inline_src_language)
+    (inline_src_args)
+    (inline_src_body))
+  (plain_text))
+
+==================
+inline_babel_call: name + arguments
+==================
+call_compute(arg1)
+
+---
+
+(inline_content
+  (inline_babel_call
+    (inline_call_name)
+    (inline_call_args))
+  (plain_text))
