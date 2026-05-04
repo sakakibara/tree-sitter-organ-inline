@@ -69,6 +69,20 @@ typedef struct {
      * (`[cite` consumed; expect /style or :); 2 = in body (expect text /
      * @key / ; / ]). */
     uint8_t citation_state;
+    /* The byte immediately before the next token to be matched.  Tracked
+     * by `try_plain_text` (last char consumed before the break) and
+     * reset to 0 (treat as BOL) at the start of each injection range.
+     * Used by emphasis_open dispatch (try_emphasis_open) to enforce
+     * Emacs's `org-emphasis-regexp-components` pre-character rule —
+     * italic / bold / underline / strike open only when prev_char is
+     * BOL (0), whitespace, or one of `('"{[`.  Without this guard,
+     * `archive/2024-completed.org_archive::` opens an italic span on
+     * `/2024…`.
+     *
+     * Stored as a uint8_t so any non-ASCII multi-byte char collapses to
+     * its leading byte — that's enough for the ASCII-only set we
+     * actually check against. */
+    uint8_t prev_char;
 } InlineState;
 
 void *tree_sitter_org_inline_external_scanner_create(void) {
@@ -85,7 +99,8 @@ unsigned tree_sitter_org_inline_external_scanner_serialize(void *p, char *b) {
     b[1 + s->span_depth]     = (char)s->ts_substate;
     b[1 + s->span_depth + 1] = (char)s->ts_active;
     b[1 + s->span_depth + 2] = (char)s->citation_state;
-    return (unsigned)(1 + s->span_depth + 3);
+    b[1 + s->span_depth + 3] = (char)s->prev_char;
+    return (unsigned)(1 + s->span_depth + 4);
 }
 
 void tree_sitter_org_inline_external_scanner_deserialize(void *p, const char *b, unsigned l) {
@@ -94,6 +109,7 @@ void tree_sitter_org_inline_external_scanner_deserialize(void *p, const char *b,
     s->ts_substate    = 0;
     s->ts_active      = 0;
     s->citation_state = 0;
+    s->prev_char      = 0;
     if (l == 0) return;
     s->span_depth = (uint8_t)b[0];
     if (s->span_depth > SPAN_STACK_MAX) { s->span_depth = 0; return; }
@@ -103,6 +119,7 @@ void tree_sitter_org_inline_external_scanner_deserialize(void *p, const char *b,
     if (base     < l) s->ts_substate    = (uint8_t)b[base];
     if (base + 1 < l) s->ts_active      = (uint8_t)b[base + 1];
     if (base + 2 < l) s->citation_state = (uint8_t)b[base + 2];
+    if (base + 3 < l) s->prev_char      = (uint8_t)b[base + 3];
 }
 
 static void span_push(InlineState *s, uint8_t marker) {
@@ -165,7 +182,6 @@ static bool try_code(InlineState *s, TSLexer *lexer, const bool *valid_symbols) 
 }
 
 static bool try_link_plain(InlineState *s, TSLexer *lexer, const bool *valid_symbols) {
-    (void)s;
     if (!valid_symbols[EXT_LINK_PLAIN_TOKEN]) return false;
     lexer->mark_end(lexer);
     bool got_proto = false;
@@ -219,6 +235,7 @@ static bool try_link_plain(InlineState *s, TSLexer *lexer, const bool *valid_sym
             got_proto = true;
             continue;
         }
+        s->prev_char = (uint8_t)(lexer->lookahead & 0xFF);
         lexer->advance(lexer, false);
         got_proto = true;
     }
@@ -295,6 +312,11 @@ static bool try_link_plain(InlineState *s, TSLexer *lexer, const bool *valid_sym
             continue;
         }
         if (is_inline_opener(c)) break;
+        /* Record the byte we're about to consume so the next scanner
+         * call can read it as `prev_char`.  Multi-byte chars collapse
+         * to their first byte (sufficient for the ASCII-only set the
+         * emphasis pre-char check uses). */
+        s->prev_char = (uint8_t)(c & 0xFF);
         lexer->advance(lexer, false);
     }
     lexer->mark_end(lexer);
@@ -1196,6 +1218,15 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (lexer->eof(lexer)) return false;
 
+    /* Reset prev_char at the BOL of each range (column 0).  The
+     * inline parser is injected per-paragraph / per-headline; each
+     * injection starts at column 0, where the next emphasis open
+     * has BOL semantics regardless of whatever prev_char the
+     * previous injection happened to leave behind.  Without this
+     * reset, the FIRST emphasis attempt of each new injection
+     * inherits the LAST char of the previous one. */
+    if (lexer->get_column(lexer) == 0) s->prev_char = 0;
+
     /* --- Inside-timestamp sub-state machine -------------------------------- */
     if (s->ts_substate == TS_EXPECT_DATE) {
         return try_ts_date(s, lexer, valid_symbols);
@@ -1343,12 +1374,33 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
 
     int open_sym = -1;
     uint8_t marker = 0;
-    if (c == '*' && valid_symbols[EXT_BOLD_OPEN])      { open_sym = EXT_BOLD_OPEN;      marker = '*'; }
-    else if (c == '/' && valid_symbols[EXT_ITALIC_OPEN])    { open_sym = EXT_ITALIC_OPEN;    marker = '/'; }
-    else if (c == '_' && valid_symbols[EXT_UNDERLINE_OPEN]) {
+    /* Emphasis pre-char rule (Emacs `org-emphasis-regexp-components`).
+     * The opening `*`/`/`/`_`/`+` only opens emphasis when it sits
+     * after BOL (prev_char == 0), whitespace, or one of `('"{[`,
+     * OR inside an existing emphasis span (nested emphasis allowed).
+     * Without this, paths like `archive/2024-completed.org_archive::`
+     * open spurious italic spans on the embedded `/`.
+     *
+     * Note: `prev_char` collapses to the leading byte of any multi-
+     * byte input character.  All relevant pre-chars (whitespace +
+     * ASCII punctuation) are single-byte, so the bytewise check below
+     * is sufficient and intentionally does not whitelist UTF-8 leading
+     * bytes (those would mean the previous char was a CJK letter or
+     * similar, which Emacs treats as a non-pre-emph context). */
+    bool emph_pre_ok =
+        s->span_depth > 0
+        || s->prev_char == 0
+        || s->prev_char == ' '  || s->prev_char == '\t' || s->prev_char == '\n'
+        || s->prev_char == '('  || s->prev_char == '['  || s->prev_char == '{'
+        || s->prev_char == '\'' || s->prev_char == '"';
+    if (c == '*' && valid_symbols[EXT_BOLD_OPEN]      && emph_pre_ok) { open_sym = EXT_BOLD_OPEN;      marker = '*'; }
+    else if (c == '/' && valid_symbols[EXT_ITALIC_OPEN]    && emph_pre_ok) { open_sym = EXT_ITALIC_OPEN;    marker = '/'; }
+    else if (c == '_' && valid_symbols[EXT_UNDERLINE_OPEN] && emph_pre_ok) {
         /* `_` could be: underline open (`_text_`), braced subscript
          * (`_{…}`), or no-brace subscript (`_X` where X is alpha/digit).
-         * We disambiguate by looking ahead. */
+         * Subscript still works after non-pre-emph chars (`H_2O`); we
+         * fall through to `try_subscript` further down for that case
+         * when emph_pre_ok is false. */
         if (valid_symbols[EXT_SUBSCRIPT_TOKEN]) {
             lexer->advance(lexer, false);  /* past `_` */
             lexer->mark_end(lexer);        /* fallback: token = just `_` */
@@ -1396,7 +1448,7 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
             open_sym = EXT_UNDERLINE_OPEN; marker = '_';
         }
     }
-    else if (c == '+' && valid_symbols[EXT_STRIKE_OPEN])    { open_sym = EXT_STRIKE_OPEN;    marker = '+'; }
+    else if (c == '+' && valid_symbols[EXT_STRIKE_OPEN]    && emph_pre_ok) { open_sym = EXT_STRIKE_OPEN;    marker = '+'; }
     if (open_sym >= 0) {
         lexer->advance(lexer, false);
         span_push(s, marker);
@@ -1464,10 +1516,12 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
                 uint8_t top = s->span_stack[s->span_depth - 1];
                 if (top == (uint8_t)cur) break;
             }
+            s->prev_char = (uint8_t)(cur & 0xFF);
             lexer->advance(lexer, false);
             consumed = true;
             continue;
         }
+        s->prev_char = (uint8_t)(cur & 0xFF);
         lexer->advance(lexer, false);
         consumed = true;
     }
