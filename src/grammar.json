@@ -219,8 +219,58 @@
       "name": "_code_token"
     },
     "link_regular": {
-      "type": "SYMBOL",
-      "name": "_link_regular_token"
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_link_regular_token"
+        },
+        {
+          "type": "FIELD",
+          "name": "target",
+          "content": {
+            "type": "SYMBOL",
+            "name": "link_target"
+          }
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "]["
+                },
+                {
+                  "type": "FIELD",
+                  "name": "description",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "link_description"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "]]"
+        }
+      ]
+    },
+    "link_target": {
+      "type": "PATTERN",
+      "value": "[^\\]\\n]+"
+    },
+    "link_description": {
+      "type": "PATTERN",
+      "value": "[^\\]\\n]*"
     },
     "link_plain": {
       "type": "SYMBOL",
@@ -909,5 +959,6 @@
     }
   ],
   "inline": [],
-  "supertypes": []
+  "supertypes": [],
+  "reserved": {}
 }

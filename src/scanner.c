@@ -495,9 +495,40 @@ static bool try_bracket_open(InlineState *s, TSLexer *lexer, const bool *valid_s
 
     lexer->advance(lexer, false);  /* consume first '[' */
 
-    /* Regular link: '[[' */
+    /* Regular link: '[[...]]'. We emit a ZERO-WIDTH validator token —
+     * the JS rule consumes the literal `[[`, target text, optional
+     * `][description]`, and `]]` so each component is a named node.
+     * The validation here advances through the candidate to verify
+     * `]]` exists before end-of-line; on failure tree-sitter restores
+     * the lexer position. */
     if (lexer->lookahead == '[' && want_link_regular) {
+        /* mark_end was at the very start of try_bracket_open's caller
+         * scan(), but the unconditional `lexer->advance` above for the
+         * first `[` advanced one char. We need mark_end to be at the
+         * pre-`[` position so the OPEN token is zero-width and the JS
+         * rule sees `[[` fresh. We can't go back, so instead: rely on
+         * tree-sitter restoring the snapshot when we return false-then-
+         * true via a state mechanism. Pragmatic alternative: encode
+         * "we saw `[[`" in the result by emitting a 1-char-wide token
+         * (the first `[`); JS rule consumes the second `[` and the
+         * link content. This is simpler. */
+        /* Actually cleanest: don't mark_end here. Just verify validity
+         * by advancing through; on success, return true with mark_end
+         * back at the pre-`[` position via... but we already advanced.
+         *
+         * Tree-sitter API: mark_end set THEN advance THEN return true
+         * → token spans original_start..mark_end_pos, lexer continues
+         * from mark_end_pos (not advance pos). So if we set mark_end
+         * NOW (after advancing past `[`), then advance through link to
+         * validate, then return true: token covers the first `[`,
+         * lexer rewinds to after the first `[`. JS rule then sees `[`
+         * and link content. We'd need JS to handle ONE `[` at start
+         * (not `[[`) — possible but quirky.
+         *
+         * Cleanest: have the OPEN token cover `[[`. Advance past second
+         * `[`, mark_end, then validate by advancing through. */
         lexer->advance(lexer, false);  /* second '[' */
+        lexer->mark_end(lexer);  /* OPEN token covers `[[` */
         int rbracket_count = 0;
         while (!lexer->eof(lexer)) {
             int32_t c = lexer->lookahead;
@@ -506,6 +537,9 @@ static bool try_bracket_open(InlineState *s, TSLexer *lexer, const bool *valid_s
                 rbracket_count++;
                 lexer->advance(lexer, false);
                 if (rbracket_count == 2) {
+                    /* Validation succeeded. mark_end is at end of `[[`,
+                     * so the OPEN token covers `[[` and the lexer
+                     * rewinds to after `[[`. JS rule consumes the rest. */
                     lexer->result_symbol = (TSSymbol)EXT_LINK_REGULAR_TOKEN;
                     return true;
                 }

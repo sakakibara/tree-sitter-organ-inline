@@ -81,7 +81,22 @@ module.exports = grammar({
     verbatim: $ => $._verbatim_token,
     code:     $ => $._code_token,
 
-    link_regular: $ => $._link_regular_token,
+    /* `_link_regular_token` is emitted by the C scanner covering only
+     * the leading `[[`. The JS rule below consumes the rest, exposing
+     * `target` and (optional) `description` as named children. */
+    link_regular: $ => seq(
+      $._link_regular_token,
+      field('target', $.link_target),
+      optional(seq('][', field('description', $.link_description))),
+      ']]',
+    ),
+
+    /* Link target: text up to either `]]` or `][`. `[^\]\n]+` eats
+     * everything except `]` and newline. The C scanner's validation
+     * guarantees a `]]` exists before end-of-line. */
+    link_target:      $ => /[^\]\n]+/,
+    link_description: $ => /[^\]\n]*/,
+
     link_plain:   $ => $._link_plain_token,
     link_angle:   $ => $._link_angle_token,
     link_radio:   $ => $._link_radio_token,

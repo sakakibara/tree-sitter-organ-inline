@@ -501,7 +501,28 @@
   {
     "type": "link_regular",
     "named": true,
-    "fields": {}
+    "fields": {
+      "description": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "link_description",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "link_target",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "macro",
@@ -1026,5 +1047,21 @@
     "type": "verbatim",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "][",
+    "named": false
+  },
+  {
+    "type": "]]",
+    "named": false
+  },
+  {
+    "type": "link_description",
+    "named": true
+  },
+  {
+    "type": "link_target",
+    "named": true
   }
 ]
