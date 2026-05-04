@@ -97,9 +97,20 @@ module.exports = grammar({
     link_target:      $ => /[^\]\n]+/,
     link_description: $ => /[^\]\n]*/,
 
-    link_plain:   $ => $._link_plain_token,
-    link_angle:   $ => $._link_angle_token,
-    link_radio:   $ => $._link_radio_token,
+    /* Plain URL link (`https://example.com`). Single token, but we
+     * alias it as a `target` field for consistency with link_regular. */
+    link_plain: $ => field('target',
+      alias($._link_plain_token, $.link_target)),
+
+    /* Angle-bracketed link (`<https://example.com>`). The brackets are
+     * part of the token text — consumers can strip them or use the
+     * full text as-is. */
+    link_angle: $ => field('target',
+      alias($._link_angle_token, $.link_target)),
+
+    /* Radio link: text matching a defined `<<<radio_target>>>`. */
+    link_radio: $ => field('target',
+      alias($._link_radio_token, $.link_target)),
 
     timestamp_active: $ => seq(
       $._ts_open_active,
@@ -185,11 +196,40 @@ module.exports = grammar({
     macro_name:     $ => /[A-Za-z][A-Za-z0-9_-]*/,
     macro_argument: $ => /[^,)]+/,
 
-    inline_src_block: $ => $._inline_src_block_token,
+    /* Inline source block `src_LANG[ARGS]{BODY}`. Scanner emits
+     * `_inline_src_block_token` covering `src_`; JS rules pull out
+     * the language, optional header args (in `[]`), and body (in `{}`). */
+    inline_src_block: $ => seq(
+      $._inline_src_block_token,
+      field('language', $.inline_src_language),
+      optional(seq(
+        '[',
+        field('header_args', $.inline_src_args),
+        ']',
+      )),
+      '{',
+      field('body', $.inline_src_body),
+      '}',
+    ),
+
+    inline_src_language: $ => /[A-Za-z][A-Za-z0-9_+-]*/,
+    inline_src_args:     $ => /[^\]\n]*/,
+    inline_src_body:     $ => /[^}\n]*/,
 
     export_snippet: $ => $._export_snippet_token,
 
-    footnote_ref: $ => $._footnote_ref_token,
+    /* Footnote reference: `[fn:label]` or `[fn:label:body]` (inline
+     * definition). Scanner emits `_footnote_ref_token` covering only
+     * `[fn:`; JS consumes label + optional `:body` + `]`. */
+    footnote_ref: $ => seq(
+      $._footnote_ref_token,
+      field('label', $.footnote_label),
+      optional(seq(':', field('body', $.footnote_body))),
+      ']',
+    ),
+
+    footnote_label: $ => /[A-Za-z0-9_-]+/,
+    footnote_body:  $ => /[^\]\n]+/,
 
     target: $ => $._target_token,
 
@@ -200,7 +240,19 @@ module.exports = grammar({
 
     entity:           $ => $._entity_token,
     latex_fragment:   $ => $._latex_fragment_token,
-    inline_babel_call: $ => $._inline_babel_call_token,
+    /* Inline babel call `call_NAME[INSIDE_HDR](ARGS)[END_HDR]`. */
+    inline_babel_call: $ => seq(
+      $._inline_babel_call_token,
+      field('name', $.inline_call_name),
+      optional(seq('[', field('inside_header', $.inline_call_args), ']')),
+      '(',
+      field('arguments', $.inline_call_args),
+      ')',
+      optional(seq('[', field('end_header', $.inline_call_args), ']')),
+    ),
+
+    inline_call_name: $ => /[A-Za-z][A-Za-z0-9_-]*/,
+    inline_call_args: $ => /[^\]\n)]*/,
 
     plain_text: $ => $._plain_text_token,
   },

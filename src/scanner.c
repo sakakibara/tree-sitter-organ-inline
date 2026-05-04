@@ -678,7 +678,10 @@ static bool try_bracket_open(InlineState *s, TSLexer *lexer, const bool *valid_s
             if (lexer->lookahead != (int32_t)kFn[i]) return false;
             lexer->advance(lexer, false);
         }
-        /* consume until ']' */
+        /* Cover only `[fn:` so the JS rule can consume the label and
+         * optional `:body`. mark_end is set at the colon. */
+        lexer->mark_end(lexer);
+        /* consume until ']' to validate */
         while (!lexer->eof(lexer)) {
             int32_t c = lexer->lookahead;
             if (c == '\n') return false;
@@ -735,6 +738,8 @@ static bool try_inline_src_block(InlineState *s, TSLexer *lexer, const bool *val
         if (lexer->lookahead != (int32_t)kSrc[i]) return false;
         lexer->advance(lexer, false);
     }
+    /* Cover only `src_` so JS rules can consume language + args + body. */
+    lexer->mark_end(lexer);
     /* consume language name: 1+ (ALPHA / DIGIT / '_' / '-') */
     if (!is_alpha(lexer->lookahead) && !is_digit(lexer->lookahead)) return false;
     while (!lexer->eof(lexer) &&
@@ -903,6 +908,8 @@ static bool try_inline_babel_call(InlineState *s, TSLexer *lexer, const bool *va
         if (lexer->lookahead != (int32_t)kCall[i]) return false;
         lexer->advance(lexer, false);
     }
+    /* Cover only `call_` so JS rules consume name + args + result. */
+    lexer->mark_end(lexer);
     /* name: 1+(ALPHA/DIGIT/'_'/'-') */
     if (!is_alpha(lexer->lookahead) && !is_digit(lexer->lookahead)) return false;
     while (!lexer->eof(lexer) &&
