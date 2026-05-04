@@ -165,7 +165,25 @@ module.exports = grammar({
     citation_suffix:    $ => $._citation_text_token,
     citation_key:       $ => $._citation_key_token,
 
-    macro: $ => $._macro_token,
+    /* `_macro_token` is emitted by the C scanner covering only the
+     * leading `{{{`. JS rules decompose into `name` and optional
+     * comma-separated `arguments`. */
+    macro: $ => seq(
+      $._macro_token,
+      field('name', $.macro_name),
+      optional(seq(
+        '(',
+        optional(seq(
+          field('argument', $.macro_argument),
+          repeat(seq(',', field('argument', $.macro_argument))),
+        )),
+        ')',
+      )),
+      '}}}',
+    ),
+
+    macro_name:     $ => /[A-Za-z][A-Za-z0-9_-]*/,
+    macro_argument: $ => /[^,)]+/,
 
     inline_src_block: $ => $._inline_src_block_token,
 

@@ -527,7 +527,28 @@
   {
     "type": "macro",
     "named": true,
-    "fields": {}
+    "fields": {
+      "argument": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "macro_argument",
+            "named": true
+          }
+        ]
+      },
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "macro_name",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "plain_text",
@@ -1049,6 +1070,18 @@
     "fields": {}
   },
   {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": ",",
+    "named": false
+  },
+  {
     "type": "][",
     "named": false
   },
@@ -1063,5 +1096,17 @@
   {
     "type": "link_target",
     "named": true
+  },
+  {
+    "type": "macro_argument",
+    "named": true
+  },
+  {
+    "type": "macro_name",
+    "named": true
+  },
+  {
+    "type": "}}}",
+    "named": false
   }
 ]

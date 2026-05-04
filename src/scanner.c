@@ -985,6 +985,8 @@ static bool try_macro(InlineState *s, TSLexer *lexer, const bool *valid_symbols)
     lexer->advance(lexer, false);
     if (lexer->lookahead != '{') return false;
     lexer->advance(lexer, false);
+    /* Cover only `{{{` so JS rules can decompose name + args + `}}}`. */
+    lexer->mark_end(lexer);
     int brace_count = 0;
     while (!lexer->eof(lexer)) {
         int32_t c = lexer->lookahead;
