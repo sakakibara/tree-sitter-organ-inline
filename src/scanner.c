@@ -1450,11 +1450,33 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
     }
     else if (c == '+' && valid_symbols[EXT_STRIKE_OPEN]    && emph_pre_ok) { open_sym = EXT_STRIKE_OPEN;    marker = '+'; }
     if (open_sym >= 0) {
+        /* Post-char rule (Emacs `org-emphasis-regexp-components`):
+         * the opening marker must NOT be immediately followed by
+         * whitespace (or EOF / newline).  `* foo*` is not bold;
+         * `+ foo +` is not strike.  This catches math expressions
+         * like `\alpha + \beta = \gamma` where `+` sits between
+         * spaces — pre-char rule lets it through, post-char rule
+         * rejects.  Advance past the marker, peek, and rewind via
+         * mark_end if invalid. */
         lexer->advance(lexer, false);
+        int32_t after = lexer->lookahead;
+        if (after == ' ' || after == '\t' || after == '\n' || after == '\r'
+            || after == 0 || lexer->eof(lexer)) {
+            /* Reject: fall through to plain_text emission so the
+             * marker char becomes literal text.  Note: we already
+             * advanced past it, so the plain_text loop below sees
+             * the char AFTER the marker.  Update prev_char to the
+             * marker so the NEXT scanner call's pre-char check
+             * still works. */
+            s->prev_char = (uint8_t)marker;
+            /* mark_end is at original position; fall through. */
+            goto fallthrough_emph_open;
+        }
         span_push(s, marker);
         lexer->result_symbol = (TSSymbol)open_sym;
         return true;
     }
+    fallthrough_emph_open:;
 
     /* Subscript: placed AFTER span openers so it doesn't interfere with underline */
     if (lexer->lookahead == '_' && try_subscript(s, lexer, valid_symbols)) return true;
