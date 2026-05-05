@@ -376,22 +376,28 @@ static bool try_angle_or_ts_active(InlineState *s, TSLexer *lexer, const bool *v
     if (lexer->lookahead == '<' && (want_link_radio || want_target)) {
         lexer->advance(lexer, false);  /* second '<' */
 
-        /* Target: '<<' + non-bracket content + '>>' (exactly 2 angle brackets, not 3) */
+        /* Target: '<<' + non-bracket content + '>>' (exactly 2 angle brackets, not 3).
+         * Per ABNF `target = "<<" 1*non-bracket ">>"`, the body must
+         * contain at least one non-bracket char; bare '<<>>' is not
+         * a valid target. */
         if (lexer->lookahead != '<') {
             if (!want_target) return false;
             /* Consume until '>>' */
+            bool body_nonempty = false;
             while (!lexer->eof(lexer)) {
                 int32_t c = lexer->lookahead;
                 if (c == '\n' || c == '[' || c == ']') return false;
                 if (c == '>') {
                     lexer->advance(lexer, false);
                     if (lexer->lookahead == '>') {
+                        if (!body_nonempty) return false;
                         lexer->advance(lexer, false);
                         lexer->result_symbol = (TSSymbol)EXT_TARGET_TOKEN;
                         return true;
                     }
                     return false;
                 }
+                body_nonempty = true;
                 lexer->advance(lexer, false);
             }
             return false;
