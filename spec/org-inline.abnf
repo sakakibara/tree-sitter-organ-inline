@@ -158,8 +158,8 @@ non-bracket-or-semi   =  %x20-3A / %x3C-5C / %x5E-7E / %x80-FF
 
 macro            =  "{{{" macro-name [ "(" macro-args ")" ] "}}}"
 macro-name       =  1*(ALPHA / DIGIT / "_" / "-")
-macro-args       =  macro-arg *("," macro-arg)
-macro-arg        =  *(macro-arg-char / macro-arg-escape)
+macro-args       =  macro-argument *("," macro-argument)
+macro-argument   =  *(macro-arg-char / macro-arg-escape)
 macro-arg-char   =  %x20-27 / %x2A-7C / %x7E-FF        ; any byte except `(` `)` `,` `}`
 macro-arg-escape =  "\\" ("," / ")")
 
@@ -167,22 +167,22 @@ macro-arg-escape =  "\\" ("," / ")")
 ; Inline source blocks  (Worg §17 Inline Source Block)
 ; ============================================================================
 
-inline-src-block =  "src_" inline-src-lang [ "[" inline-src-args "]" ]
-                    "{" inline-src-body "}"
-inline-src-lang  =  1*(ALPHA / DIGIT / "_" / "-")
-inline-src-args  =  *non-bracket
-inline-src-body  =  *(inline-src-char / inline-src-escape)
-inline-src-char  =  %x20-7C / %x7E-FF                  ; any byte except `}`
-inline-src-escape=  "\\" "}"
+inline-src-block    =  "src_" inline-src-language [ "[" inline-src-args "]" ]
+                       "{" inline-src-body "}"
+inline-src-language =  1*(ALPHA / DIGIT / "_" / "-")
+inline-src-args     =  *non-bracket
+inline-src-body     =  *(inline-src-char / inline-src-escape)
+inline-src-char     =  %x20-7C / %x7E-FF               ; any byte except `}`
+inline-src-escape   =  "\\" "}"
 
 ; ============================================================================
 ; Inline babel calls  (Worg §17 Inline Babel Calls)
 ; ============================================================================
 
-inline-babel-call =  "call_" babel-name [ "[" babel-args "]" ]
-                     "(" babel-args ")" [ "[" babel-args "]" ]
-babel-name        =  1*(ALPHA / DIGIT / "_" / "-")
-babel-args        =  *non-paren
+inline-babel-call =  "call_" inline-call-name [ "[" inline-call-args "]" ]
+                     "(" inline-call-args ")" [ "[" inline-call-args "]" ]
+inline-call-name  =  1*(ALPHA / DIGIT / "_" / "-")
+inline-call-args  =  *non-paren
 
 ; ============================================================================
 ; Export snippets  (Worg §17 Export Snippets)
@@ -198,12 +198,12 @@ snippet-escape   =  "\\@"
 ; Footnote references  (Worg §17 Footnote References)
 ; ============================================================================
 
-footnote-ref           =  footnote-ref-named / footnote-ref-anonymous /
-                          footnote-ref-inline
-footnote-ref-named     =  "[fn:" footnote-label "]"
-footnote-ref-anonymous =  "[fn:" footnote-label ":" 1*non-bracket "]"
-footnote-ref-inline    =  "[fn::" 1*non-bracket "]"
-footnote-label         =  1*(ALPHA / DIGIT / "_" / "-")
+; Three surface forms — `[fn:LABEL]` (named), `[fn:LABEL:BODY]` (named
+; with inline body), `[fn::BODY]` (anonymous inline).  Grammar exposes
+; one footnote-ref node carrying optional label + optional body fields.
+footnote-ref   =  "[fn:" [footnote-label] [":" footnote-body] "]"
+footnote-label =  1*(ALPHA / DIGIT / "_" / "-")
+footnote-body  =  1*non-bracket
 
 ; ============================================================================
 ; Statistics cookies  (Worg §17 Statistics Cookies)

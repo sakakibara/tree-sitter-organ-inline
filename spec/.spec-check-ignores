@@ -1,0 +1,55 @@
+# Rule names that exist in spec/org-inline.abnf to describe structural
+# shape but have no 1:1 named node in grammar.js (the parser collapses
+# them into external scanner tokens or regex character classes).
+# `make spec-check` skips these in the rule-name diff.
+#
+# Format: one rule name per line, `#` for comments, blank lines OK.
+
+# Primitives — RFC 5234 helpers / organ shape
+line-end
+indent
+non-line
+non-bracket
+non-paren
+non-brace
+
+# Collective alias — grammar exposes each kind individually
+inline-object
+
+# Character classes — grammar uses inline regex (e.g. /[^\]\n]/)
+verbatim-char
+code-char
+plain-char
+plain-url-char
+target-char
+target-escape
+desc-char
+angle-char
+non-bracket-or-semi
+macro-arg-char
+macro-arg-escape
+inline-src-char
+inline-src-escape
+snippet-char
+snippet-escape
+latex-char
+
+# Body / shape helpers — describe the structure of larger constructs
+link-protocol
+ts-payload
+ts-repeater-mark
+ts-warning-mark
+ts-unit
+macro-args
+export-backend
+export-value
+cookie-body
+cookie-pct
+cookie-frac
+entity-name
+latex-paren
+latex-bracket
+latex-dollar1
+latex-dollar2
+subscript-body
+superscript-body

@@ -3,7 +3,7 @@
 # Per-platform output to avoid clobbering across hosts on a shared checkout:
 #   build/<os>-<arch>/org_inline.so
 
-.PHONY: build clean test
+.PHONY: build clean test spec-check
 
 UNAME_S := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 UNAME_M := $(shell uname -m)
@@ -35,6 +35,13 @@ node_modules/.bin/tree-sitter:
 
 test: build
 	./node_modules/.bin/tree-sitter test
+
+# Verify spec/org-inline.abnf and grammar.js list the same set of named
+# rules.  Reads spec/.spec-check-ignores for shape-only ABNF rules
+# (primitives, character classes, body shapes) that have no 1:1
+# grammar.js counterpart by design.
+spec-check:
+	@node scripts/check-abnf-sync.js grammar.js spec/org-inline.abnf
 
 clean:
 	rm -rf build/
