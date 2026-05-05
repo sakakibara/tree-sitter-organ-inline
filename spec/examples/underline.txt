@@ -1,8 +1,7 @@
 # Underline emphasis (`_…_`).
-# Note: underline shares scanner code with subscript and takes early-
-# return paths that bypass the bold/italic post-char check.  Negative
-# cases here focus on subscript-vs-underline disambiguation, not on
-# the post-char-space rule.
+# Shares scanner code with subscript via early-return paths, but the
+# final `_` <other> path now applies the same post-char rule used by
+# bold/italic/strike.
 
 + _under_
 + a _under_ b
@@ -14,3 +13,7 @@
 - x_1
 # No close.
 - _under
+# Space after open -- post-char rejects (matches bold/italic/strike).
+- _ not under_
+# Bare `_` followed by EOL -- post-char rejects.
+- _

@@ -1440,7 +1440,22 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
                 lexer->result_symbol = (TSSymbol)EXT_SUBSCRIPT_TOKEN;
                 return true;
             }
-            /* `_` followed by something else — underline open. */
+            /* `_` followed by something else (not `{`, not alpha,
+             * not digit, not closing `_`).  Apply the same post-char
+             * rule used by the open_sym shared dispatch below: reject
+             * underline open when the next char is whitespace / EOF
+             * / newline (`org-emphasis-regexp-components`).  Without
+             * this, `_ word_` would erroneously open underline.  The
+             * other early-return paths above are reachable only when
+             * lookahead is `{`, alpha, or digit, so they implicitly
+             * pass the post-char check; only this final fall-through
+             * needs the explicit guard. */
+            int32_t after = lexer->lookahead;
+            if (after == ' ' || after == '\t' || after == '\n' || after == '\r'
+                || after == 0 || lexer->eof(lexer)) {
+                s->prev_char = '_';
+                goto fallthrough_emph_open;
+            }
             span_push(s, '_');
             lexer->result_symbol = (TSSymbol)EXT_UNDERLINE_OPEN;
             return true;
