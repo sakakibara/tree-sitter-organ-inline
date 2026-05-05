@@ -1,0 +1,16 @@
+# Plain link: `<scheme>://<path>` -- no `[[...]]` or `<...>` wrapper.
+# Per spec/org-inline.abnf: link-plain = link-protocol "://" 1*plain-url-char.
+# Schemes WITHOUT `://` (mailto:, doi:) are not link_plain in the
+# grammar; they're matched as plain-text or via other paths.
+
++ http://example.com
++ https://example.com/path
++ ftp://files.example.org
++ https://example.com/a/b?c=d
+
+# Bare word.
+- example
+# Scheme without `://`.
+- mailto:user@example.com
+# Relative path.
+- ./local/file.txt

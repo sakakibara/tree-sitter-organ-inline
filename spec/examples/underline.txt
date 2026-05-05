@@ -1,0 +1,16 @@
+# Underline emphasis (`_…_`).
+# Note: underline shares scanner code with subscript and takes early-
+# return paths that bypass the bold/italic post-char check.  Negative
+# cases here focus on subscript-vs-underline disambiguation, not on
+# the post-char-space rule.
+
++ _under_
++ a _under_ b
++ (_under_)
+
+# Subscript context: `H_2` and `H_2O` should NOT open underline (no
+# closing `_`, alpha-only run after `_` is subscript).
+- H_2O
+- x_1
+# No close.
+- _under

@@ -1,0 +1,13 @@
+# Angle-bracketed link: `<scheme://path>`.
+# Per spec/org-inline.abnf: link-angle = "<" link-protocol "://" 1*angle-char ">".
+
++ <http://example.com>
++ <https://example.com/path>
++ <ftp://files.example.org/x>
+
+# Missing close `>`.
+- <http://example.com
+# No `://`.
+- <foo>
+# Plain link without brackets.
+- http://example.com

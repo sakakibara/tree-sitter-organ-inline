@@ -1,0 +1,13 @@
+# Footnote reference: `[fn:LABEL]`, `[fn:LABEL:body]`, or
+# anonymous `[fn::body]`.
+
++ [fn:1]
++ [fn:label]
++ [fn:label:inline body]
++ [fn::anonymous body]
+
+# Not a footnote: missing `fn:`.
+- [1]
+- [label]
+# Wrong prefix.
+- [n:1]

@@ -1,0 +1,12 @@
+# Citation reference: a `prefix @key suffix` triple inside a citation.
+# Tested via embedded citations since citation_reference is structural,
+# not standalone-parseable.
+
++ [cite:@key]
++ [cite:@k1;@k2;@k3]
++ [cite:see @smith2023 for details]
+
+# No `@` anywhere.
+- [cite:plain text only]
+# Bracket without cite prefix.
+- [@key]

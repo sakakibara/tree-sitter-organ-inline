@@ -1,0 +1,15 @@
+# Bold emphasis (`*…*`).
+# Pre-char: BOL or one of ws / `('"{[`.
+# Post-char rule: marker NOT immediately followed by ws.
+
++ *bold*
++ a *bold* b
++ (*bold*)
++ "*bold*"
+
+# Trailing `*` after letter rejected (no pre-char, post-char not relevant).
+- not*bold*here
+# Space after open rejected (post-char).
+- * not bold*
+# Single `*` -- no close.
+- *bold

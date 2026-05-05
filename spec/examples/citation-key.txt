@@ -1,0 +1,12 @@
+# Citation key (the `@whatever` inside [cite:...]).
+# Tested via embedded contexts since citation_key only appears inside
+# a citation/citation_reference.
+
++ [cite:@SmithEtAl2023]
++ [cite:@key1;@key2]
++ [cite:@key_with_underscore]
+
+# No `@` -- bare word.
+- [cite:notakey]
+# Outside citation context -- bare `@foo` is not a citation_key.
+- @foo

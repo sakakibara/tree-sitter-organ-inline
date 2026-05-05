@@ -3,7 +3,7 @@
 # Per-platform output to avoid clobbering across hosts on a shared checkout:
 #   build/<os>-<arch>/org_inline.so
 
-.PHONY: build clean test spec-check
+.PHONY: build clean test spec-check test-spec
 
 UNAME_S := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 UNAME_M := $(shell uname -m)
@@ -42,6 +42,13 @@ test: build
 # grammar.js counterpart by design.
 spec-check:
 	@node scripts/check-abnf-sync.js grammar.js spec/org-inline.abnf
+
+# Per-rule positive/negative example tests under spec/examples/.
+# Behavior matching: feeds each `+ input` line through the parser and
+# asserts the named node appears; feeds each `- input` and asserts it
+# does not.  Stronger than rule-name sync alone.
+test-spec: build
+	@node scripts/test-rule-examples.js
 
 clean:
 	rm -rf build/

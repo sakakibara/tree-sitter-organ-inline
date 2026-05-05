@@ -1,0 +1,12 @@
+# Strike-through emphasis (`+…+`).
+
++ +struck+
++ a +struck+ b
++ (+struck+)
+
+# Math: `\alpha + \beta` -- whitespace around `+`, post-char rejects open.
+- \alpha + \beta = \gamma
+# Space after open.
+- + not struck+
+# No close.
+- +struck

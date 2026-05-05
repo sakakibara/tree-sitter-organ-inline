@@ -1,0 +1,13 @@
+# Italic emphasis (`/…/`).
+
++ /italic/
++ a /italic/ b
++ /lead/
++ "*italic-after-quote* /italic/"
+
+# Path with embedded `/` -- no pre-char on the embedded slash.
+- archive/2024-completed.org_archive::
+# Space after open.
+- / not italic/
+# Single `/` -- no close.
+- /italic

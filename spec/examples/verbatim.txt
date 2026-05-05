@@ -1,0 +1,12 @@
+# Verbatim (`=…=`).
+# Note: verbatim does not enforce the bold/italic/strike post-char
+# rule (no rejection on space-after-open).  See scanner try_verbatim.
+
++ =verbatim=
++ a =literal text= b
++ =x = 1=
+
+# Single `=` -- no close.
+- =verb
+# Empty between markers.
+- ==

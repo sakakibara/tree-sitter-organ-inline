@@ -1,0 +1,12 @@
+# Inline code (`~…~`).
+# Note: code does not enforce the bold/italic/strike post-char rule
+# (no rejection on space-after-open).  See scanner try_code.
+
++ ~code~
++ a ~code with spaces~ b
++ ~x = 1~
+
+# Single `~` -- no close.
+- ~code
+# Empty between markers (~~) is not code.
+- ~~

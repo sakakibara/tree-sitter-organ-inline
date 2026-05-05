@@ -1,0 +1,14 @@
+# Statistics cookie: `[N/M]` (count) or `[P%]` (percent).
+
++ [3/5]
++ [0/0]
++ [50%]
++ [100%]
++ [/]
++ [%]
+
+# Missing brackets / wrong shape.
+- 3/5
+- (3/5)
+# Letters inside.
+- [foo/bar]

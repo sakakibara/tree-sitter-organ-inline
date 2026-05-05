@@ -1,0 +1,13 @@
+# Citation: `[cite:@key]`, `[cite/style:@key]`, multiple keys, prefix/suffix.
+
++ [cite:@key]
++ [cite:@k1;@k2]
++ [cite/style:@key]
++ [cite:prefix @key suffix]
+
+# Bare bracket-content -- not a citation.
+- [@key]
+# Missing colon.
+- [cite@key]
+# Missing key.
+- [cite:]

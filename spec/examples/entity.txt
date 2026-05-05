@@ -1,0 +1,17 @@
+# Entity: `\name` for known entity names (alpha, beta, ldots, etc.).
+# Per Emacs `org-entities`.
+
++ \alpha
++ \beta
++ \gamma
++ \ldots
++ \pi
+
+# Note: the grammar accepts `\<alpha>+` structurally; the `org-entities`
+# allowlist is not enforced at parse time.  So `\unknownword` parses
+# as an entity even though Emacs would render it literally.
+
+# Missing backslash.
+- alpha
+# Just a backslash.
+- \

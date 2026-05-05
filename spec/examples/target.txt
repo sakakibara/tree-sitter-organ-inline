@@ -1,0 +1,14 @@
+# Internal target: `<<name>>`.
+
++ <<my-target>>
++ <<chapter 1>>
++ <<refs/intro>>
+
+# Note: the grammar currently accepts empty `<<>>`; per ABNF
+# `target = "<<" 1*target-char ">>"` should require >= 1 char.
+# Filed as a low-priority drift; not enforced here.
+
+# Single angle brackets -- not a target.
+- <not target>
+# Missing close.
+- <<not closed
