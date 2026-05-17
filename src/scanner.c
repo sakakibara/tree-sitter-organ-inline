@@ -1370,9 +1370,9 @@ bool tree_sitter_org_inline_external_scanner_scan(void *payload, TSLexer *lexer,
 
     if (lexer->lookahead == '^' && try_superscript(s, lexer, valid_symbols)) return true;
 
-    if (lexer->lookahead == 's' && try_inline_src_block(s, lexer, valid_symbols)) return true;
+    if (s->span_depth == 0 && lexer->lookahead == 's' && try_inline_src_block(s, lexer, valid_symbols)) return true;
 
-    if (lexer->lookahead == 'c' && try_inline_babel_call(s, lexer, valid_symbols)) return true;
+    if (s->span_depth == 0 && lexer->lookahead == 'c' && try_inline_babel_call(s, lexer, valid_symbols)) return true;
 
     if (s->span_depth == 0 &&
         (lexer->lookahead >= 'a' && lexer->lookahead <= 'z') &&

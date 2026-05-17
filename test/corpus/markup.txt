@@ -45,6 +45,26 @@ _a_ +b+
     (plain_text)))
 
 ==================
+Strike with single-letter `s` body
+==================
++s+
+---
+
+(inline_content
+  (strike
+    (plain_text)))
+
+==================
+Strike with single-letter `c` body
+==================
++c+
+---
+
+(inline_content
+  (strike
+    (plain_text)))
+
+==================
 Plain text only
 ==================
 just text
